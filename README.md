@@ -15,9 +15,10 @@
 
 ## ⚙️ 파일 구성
 
-저장소에는 총 2가지의 주요 스크립트가 포함되어 있습니다:
-1. `test_monitor.py`: Slack Webhook 연동 및 네트워크 세팅이 제대로 이뤄졌는지 1회용으로 테스트하기 위한 파일입니다. 무한 반복되지 않고 한 번만 구동됩니다.
-2. `tank_must_monitor.py`: 실사용을 위한 메인 모니터링 봇입니다. 24시간 도는 루프를 실행하며 지터(Jitter)로 쉬는 시간을 계산해 수십 초마다 자동으로 새로고침하며 재고를 추적합니다. 
+저장소에는 다음 파일들이 포함되어 있습니다:
+1. `common.py`: 두 스크립트가 공유하는 설정과 유틸리티(상품 URL, `.env` 로딩, Slack 알림, 브라우저/컨텍스트 생성, 리소스 차단)를 모아둔 모듈입니다.
+2. `test_monitor.py`: Slack Webhook 연동 및 네트워크 세팅이 제대로 이뤄졌는지 1회용으로 테스트하기 위한 파일입니다. 무한 반복되지 않고 한 번만 구동됩니다.
+3. `tank_must_monitor.py`: 실사용을 위한 메인 모니터링 봇입니다. 24시간 도는 루프를 실행하며 지터(Jitter)로 쉬는 시간을 계산해 수십 초마다 자동으로 새로고침하며 재고를 추적합니다.
 
 ## 🔧 설치 및 요구 사항 (Prerequisites)
 
@@ -25,7 +26,7 @@ PC에 Python 3.8 이상의 버전이 설치되어 있어야 합니다.
 
 ```bash
 # 필요한 패키지 설치
-pip install playwright requests
+pip install -r requirements.txt
 
 # Playwright 엔진 모듈 설치 (최초 1회)
 playwright install chromium
@@ -34,11 +35,15 @@ playwright install chromium
 ## 📦 실행 방법 (Setup & Run)
 
 1. **Slack Webhook 설정 및 환경변수 등록**  
-   보안을 위해 저장소의 깃(Git) 내역에 올라가지 않도록 최상단 경로에 `.env` 파일을 새로 만들어 줍니다.
+   보안을 위해 저장소의 깃(Git) 내역에 올라가지 않도록 `.env.example`을 복사해 `.env` 파일을 만들고, 본인의 Slack Webhook URL로 값을 채워줍니다.
+   ```bash
+   cp .env.example .env
+   ```
    ```env
-   # .env 파일 생성 후, 내부에 본인의 Slack Webhook URL 추가
+   # .env
    SLACK_WEBHOOK_URL="https://hooks.slack.com/services/XXX/YYY/ZZZ"
    ```
+   사내 프록시 환경이라면 `HTTPS_PROXY`(또는 `HTTP_PROXY`) 환경변수를 추가로 설정하면 두 스크립트 모두 자동으로 프록시를 통해 접속합니다.
 
 2. **환경 테스트 동작 점검 (최초 1회)**
    ```bash
